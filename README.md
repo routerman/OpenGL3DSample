@@ -3,7 +3,7 @@ OpenGL3DSample
 
 #3D Applications with OpenGL
 
-##Ready for execute
+##Execution
 ###CentOS
 
 ::
@@ -17,8 +17,8 @@ OpenGL3DSample
 ###Mac
 nothing..
 
-***
 
+==============
 ##Sample Programs
 
 1. molecular

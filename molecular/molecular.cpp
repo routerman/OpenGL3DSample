@@ -1,5 +1,4 @@
 #include <stdlib.h>
-//#include <time.h>
 #include <math.h>
 #include <iostream>
 
@@ -16,10 +15,14 @@
 #endif
 
 #define ESC 27
+const int init_window_width=700;
+const int init_window_height=700;
 const int max_ball = 100; //
 double gravity = 0;// -0.098;
 double angle = 0.0; 
 double theta = 0.0;
+double delta_angle = 0.0; 
+double delta_theta = 0.0;
 double zoom = 1.0;
 int isDragging = 0;
 int xDragStart = 0;
@@ -42,7 +45,6 @@ public:
 		this->z = z;
 		vx = vy = vz = 0;
 		ax = ay = az = 0;
-		az = - g;
 	}
 	void setColor(double r, double g, double b){
 		this->r = r;
@@ -98,16 +100,16 @@ public:
 		glPopMatrix();
 	}
 	void move(){
-		ax = 0;
-		ay = 0;
-		az = gravity;
+		double n=x*x+y*y+z*z;
+		ax = gravity*x/n;
+		ay = gravity*y/n;
+		az = gravity*z/n;
 		vx += ax;
 		vy += ay;
 		vz += az;
 		x += vx;
 		y += vy;
 		z += vz;
-		//r = (vx*vx + vy*vy + vz*vz)/10;
 	}
 	void collision(){
 		if ( ( x >100-radius && vx >0 ) || ( x < -100+radius && vx < 0 ) ){
@@ -156,15 +158,6 @@ void display(void)
 	//draw plane
 	glColor4d(0.0, 0.0, 0.0, 1);
 	//glColor3d(0.0, 0.7, 0.0);
-	/*
-	glBegin(GL_QUADS);
-		glNormal3f(0, 0, 1);
-		glVertex3f(-100.0, -100.0, -100.0);
-		glVertex3f(-100.0, 100.0, -100.0);
-		glVertex3f(100.0, 100.0, -100.0);
-		glVertex3f(100.0, -100.0, -100.0);
-	glEnd();
-	*/
 	glColor3f(0.0, 0.0, 0.0);
 	for (double x = -100; x <= 100; x += 50){
 		glBegin(GL_LINE_LOOP);
@@ -230,25 +223,24 @@ void releaseSpecialKey(int key, int x, int y)
 
 void mouseMove(int x, int y)
 {
-	if (isDragging) { 
+	if (isDragging) {
 		angle = (xDragStart-x) * 0.005;
 		theta = (y-yDragStart) * 0.002;
 	}
+	//angle += delta_angle;
+	//theta += delta_theta;
 }
 
 void mouseButton(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON) {
-		if (state == GLUT_DOWN) { // left mouse button pressed
-			isDragging = 1; // start dragging
-			if( xDragStart ==0 )xDragStart = x; // save x where button first pressed
-			if (yDragStart == 0)xDragStart = y; // save y where button first pressed
-		}
-		else  { /* (state = GLUT_UP) */
-			isDragging = 0; // no longer dragging
-			xDragStart = 0;
-			yDragStart = 0;
-		}
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) { // left mouse button pressed
+		isDragging = 1; // start dragging
+		if( xDragStart == 0 ) xDragStart = x; // save x where button first pressed
+		if( yDragStart == 0 ) yDragStart = y; // save y where button first pressed
+	} else { /* (state = GLUT_UP) */
+		isDragging = 0; // no longer dragging
+		xDragStart = 0;
+		yDragStart = 0;
 	}
 }
 
@@ -279,15 +271,15 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(10, 10);
-	glutInitWindowSize(2500, 1500);
-	glutCreateWindow("OpenGL3D sample");
+	glutInitWindowSize(init_window_width,init_window_height);
+	glutCreateWindow("molecular");
 
 	//LIGHT
-	static GLfloat lightPosition[4] = { 0.0, 0.0, 100.0, 0.5 }; //光源の位置
-	static GLfloat spotDirrection[3] = { 0.0, 0.0, -1.0 }; //スポットライトを向ける方向
-	static GLfloat lightCol[3] = { 1.0, 1.0, 1.0 }; //拡散光
-	static GLfloat lightAmbient[3] = { 0.25, 0.25, 0.25 }; //環境光
-	static GLfloat lightSpecular[3] = { 1.0, 1.0, 1.0 }; //鏡面光
+	static GLfloat lightPosition[4] = { 0.0, 0.0, 100.0, 0.5 };
+	static GLfloat spotDirrection[3] = { 0.0, 0.0, -1.0 };
+	static GLfloat lightCol[3] = { 1.0, 1.0, 1.0 };
+	static GLfloat lightAmbient[3] = { 0.25, 0.25, 0.25 };
+	static GLfloat lightSpecular[3] = { 1.0, 1.0, 1.0 };
 
 
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
@@ -297,9 +289,9 @@ int main(int argc, char **argv)
 
 	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, materialCol);
 	//glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.01);
-	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spotDirrection); //スポットライトの向ける方向（デフォルト (0,0,-1.0)）
-	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 150.0);// スポットライトの絞り（デフォルト 180.0）
-	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 0.1);// スポットライトの中心からの減衰の度合い（デフォルト 0）
+	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spotDirrection);
+	//glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 150.0);
+	//glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 0.1);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
@@ -310,8 +302,8 @@ int main(int argc, char **argv)
 	//glEnable(GL_FOG);
 
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//アルファの設定
-	glEnable(GL_BLEND);//アルファのブレンド有効
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
 
 	glEnable(GL_DEPTH_TEST);
 	
