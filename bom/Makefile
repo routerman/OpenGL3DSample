@@ -1,7 +1,6 @@
-TARGET=molecular
+TARGET=bom
 CC=g++
-OPT=-w -g
-#OPT=-Wall -g
+OPT=-Wall -g
 ifeq ($(shell uname),Darwin)
 	LIB=-framework OpenGL -framework GLUT -framework Foundation
 else

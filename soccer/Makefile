@@ -1,6 +1,7 @@
 TARGET=soccer
 CC=g++
-OPT=-Wall -g
+#OPT=-Wall -g
+OPT=-w -g
 ifeq ($(shell uname),Darwin)
 	LIB=-framework OpenGL -framework GLUT -framework Foundation
 else
