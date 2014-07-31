@@ -1,5 +1,7 @@
 molecular/molecular
 soccer/soccer
+bom/bom
+flight/flight
 # Compiled Object files
 *.slo
 *.lo

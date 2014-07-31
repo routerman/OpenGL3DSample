@@ -79,7 +79,7 @@ public:
 		}
 	}
 	void lookat(){
-		if(camera == 0)gluLookAt( 0.0, -200.0, 250,   0.0, 0.0, 0.0,  0.0, 0.0, 1.0);
+		if(camera == 0)gluLookAt( 0.0, -50.0, 300,   0.0, 0.0, 0.0,  0.0, 0.0, 1.0);
 		else if(camera != 0)gluLookAt( r.x-50*d.x, r.y-50*d.y, 30,   r.x+d.x, r.y+d.y, 5.0,  0.0, 0.0, 1.0);
 	}
 	void draw(){
@@ -103,7 +103,7 @@ public:
 		if( mode == WAIT ){
 			mode = WAIT;
 		}else if( mode == CHASE ){
-			if( Vector3D::getDistance( r+radius*d, ball->r) <= radius ){
+			if( Vector3D::getDistance( r+radius*d, ball->r) <= 2*radius ){
 				if( cos(  Vector3D::inner_product(d,goal-r) / ( Vector3D::getNorm(d) * Vector3D::getNorm(goal-r) )  ) > 0.9 ){
 					mode = DRIBBLE;
 				}else{
@@ -146,7 +146,7 @@ public:
 			accel = -0.1;
 			//set ball velocity to turn
 			double n = Vector3D::getDistance(ball->r,this->r);
-			double phi = 0.001*Vector3D::getAngle(goal-r,ball->r-r);
+			double phi = 0.01*Vector3D::getAngle(goal-r,ball->r-r);
 			if( phi>1)phi=1;
 			else if( phi<-1)phi=-1;
 			ball->setVelocity(  phi*(ball->r.y-r.y)/n+0.5*d.x, -phi*(ball->r.x-r.x)/n+0.5*d.y,0);
