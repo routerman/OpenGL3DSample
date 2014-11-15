@@ -32,11 +32,22 @@ void Fighter::move(){
 	r+=v;
 }
 
-void Fighter::dropbomb( list<Bomb> *a){
-	Bomb b;
+void Fighter::shoot( list<Bullet> *bullets){
+	if ( --bulletwait > 0 && command != 1) return;
+	cout << " shoot!" << endl;
+	Bullet b;
 	b.fire(r,d,v);
-	a->push_back(b);
-	bombwait=50;
+	bullets->push_back(b);
+	bulletwait=1000;
+}
+
+void Fighter::dropbomb( list<Bomb> *bombs){
+	if ( --bombwait > 0 && command != 2) return;
+	cout << " Bomb!" << endl;
+	//Bomb b;
+	//b.fire(r,d,v);
+	//bombs->push_back(b);
+	bombwait=100000;
 }
 
 
@@ -45,7 +56,7 @@ void Fighter::drow(){
 	glPushMatrix();
 	glTranslatef(r.x,r.y,r.z);	//機体の位置
 	F3 a = F3::cross(u,d);
-	/* 回転行列　XYZの順番に回転する */
+
 	glRotatef(-atan2f(u.y,u.z)*180/M_PI,1,0,0);//x軸
 	glRotatef(		asinf(u.x)*180/M_PI,0,1,0);//y軸
 	glRotatef(-atan2f(a.x,d.x)*180/M_PI,0,0,1);//z軸
@@ -75,13 +86,11 @@ void Fighter::drow(){
 
 //CONTROL
 void Fighter::control(int keystat){
-	//前進か後進か
 	//if(!(players[id].mode & MODE_DEAD)){
 	if( keystat & KEYSTAT_GO )pitch=-0.02;
 	else if( keystat & KEYSTAT_BACK )pitch=0.02;
 	else pitch=0;
 
-	//左か右か
 	if( keystat & KEYSTAT_LEFT )roll=-0.03;
 	else if( keystat & KEYSTAT_RIGHT )roll=0.03;
 	else roll=0;
@@ -92,40 +101,43 @@ void Fighter::control(int keystat){
 	else f=0;
 
 	//shot
-	//if( keystat & KEYSTAT_SHOT )comand=1;
+	command = 0;
+	if( keystat & KEYSTAT_SHOOT )command = 1;
+	if( keystat & KEYSTAT_BOMB )command = 2;
 
-	//スペースで武器のタイプを切り替える
-	//何も押してないとき
 	if( (keystat & ~KEYSTAT_IDLE)==0 ){
 		keystat=KEYSTAT_IDLE;
 		f=0;
 	}
 	
 }
+
 void Fighter::drive(Fighter target){
-	F3 w,uxd,b;
-	w=target.r-this->r;
-	float dist=F3::range(w);
-	if(dist>300){
-		f=1;
-		c=0;
-	}else if(dist<=300 && dist>30){
-		f=0.7;
-		c=0;
-	}else {
-		f=0.5;
-		c=0.1;
+	F3 w, uxd, b;
+	w = target.r - this->r;
+	float dist = F3::range(w);
+	if ( dist > 1000 ) {
+		f = 10;
+		c = 0;
+		command = 1;
+	} else if( dist <= 1000 && dist > 300 ){
+		f = 3;
+		c = 0;
+		command = 2;
+	} else {
+		f = 0.5;
+		c = 0.1;
 	}
-	w=F3::unit(w);
-	uxd = F3::unit( F3::cross(this->u,this->d) );
-	b = F3::cross(this->u,w);
-	pitch=roll=0;
+	w = F3::unit(w);
+	uxd = F3::unit( F3::cross( this->u, this->d ) );
+	b = F3::cross( this->u, w);
+	pitch = roll = 0;
 
-	roll=-(w*uxd);
+	roll = -( w * uxd );
 	pitch= w*u;
-	if( w*d<0 )pitch=0.01;//機体後方にいるとき、
+	if( w*d < 0 ) pitch=0.01;
 
-	float cc=cosf(2*atanf(pitch/(roll+0.001)));
+	float cc = cosf( 2 * atanf( pitch / ( roll + 0.001 ) ) );
 	//if(cc<0)cc*=-1;
 	cc*=cc;
 	pitch*=cc;
@@ -143,9 +155,8 @@ void Fighter::drive(Fighter target){
 	//}
 	*/
 	//regulater
-	if(roll>0.01)roll=0.01;
-	else if(roll<-0.01)roll=-0.01;
-	if(pitch>0.01)pitch=0.01;
-	else if(pitch<-0.01)pitch=-0.01;
-
+	if( roll > 0.05 ) roll = 0.05;
+	else if( roll < -0.05 ) roll = -0.05;
+	if( pitch > 0.01 ) pitch = 0.01;
+	else if( pitch < -0.01 ) pitch = -0.01;
 }

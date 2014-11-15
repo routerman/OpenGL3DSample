@@ -1,7 +1,8 @@
 TARGET=flight
 CC=g++
 #OPT=-Wall -g
-OPT=-w -g
+#OPT=-w -g
+OPT=-w -O2
 ifeq ($(shell uname),Darwin)
 	LIB=-framework OpenGL -framework GLUT -framework Foundation
 else

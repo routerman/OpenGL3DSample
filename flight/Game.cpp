@@ -44,23 +44,22 @@ void Game::display(){
 			centor.x,centor.y,centor.z,
 			up.x,up.y,up.z);
 
-	/* 背景の色:黒 */
 	glClearColor(0,0,0,0);
 
 	//GRID
 	glBegin(GL_LINES);
 	glColor3f(1,1,1);//
-	for(float x=-10000;x<=10000;x+=50){
+	for(float x=-10000;x<=10000;x+=100){
 		glVertex3f(x,-10000,0);
 		glVertex3f(x, 10000,0);
 	}
-	for(float y=-10000;y<=10000;y+=50){
+	for(float y=-10000;y<=10000;y+=100){
 		glVertex3f(-10000,y,0);
 		glVertex3f( 10000,y,0);
 	}
 	glEnd();
 	glBegin(GL_QUADS);
-	glColor3f(0.4,0.2,0.2);//
+	glColor3f(0.2,0.2,0.2);//
 	glVertex3f( 10000, 10000,-1);
 	glVertex3f(-10000, 10000,-1);
 	glVertex3f(-10000,-10000,-1);
@@ -136,10 +135,12 @@ void Game::display(){
 
 void Game::timer(){
 	fighter.model();
-	if( (--fighter.bombwait<0 ) && (keystat & KEYSTAT_SHOT) )fighter.dropbomb(&bomblist);
+	if( keystat & KEYSTAT_BOMB ) fighter.dropbomb(&bomblist);
+	if( keystat & KEYSTAT_SHOOT ) fighter.shoot(&bulletlist);
 	for( list<Fighter>::iterator it = enemylist.begin(); it != enemylist.end(); it++ ){
 		it->model();
-		//if( keystat & KEYSTAT_SHOT )it->shootest(&bulletlist);
+		it->dropbomb(&bomblist);
+		it->shoot(&bulletlist);
 	}
 	for( list<Bullet>::iterator it = bulletlist.begin(); it != bulletlist.end(); it++ ){
 		it->move();
@@ -171,96 +172,34 @@ void Game::init(){
 	//Surface initialization
 	Surface s;
 	F3 s1,s2,s3,s4;
-	/*
-	for(){
-		//read xml file
-		s1.set(0,0,0);
-		s2.set(0,0,0);
-		s3.set(0,0,0);
-		s4.set(0,0,0);
-		s.set(s1,s2,s3,s4);
-		surfacelist.push_back(s);
-	}
-	
-    
-
-
- 
-	typedef boost::escaped_list_separator<char>    
-	BOOST_ESCAPED_LIST_SEP;
-	typedef boost::tokenizer< boost::escaped_list_separator<char> >
-	BOOST_TOKENIZER_ESCAPED_LIST;
- 
-	void dump(boost::tokenizer< boost::escaped_list_separator<char> > &tokens)
-	{
-			BOOST_FOREACH(std::string s, tokens) {
-					std::cout << "<" << s << "> ";
-			}
-			std::cout << std::endl;
-	}
- 
-	int
-	main(int argc, char const* argv[])
-	{
- 
-			std::ifstream   ifs;
-			std::string     csv_file_path ("test.csv"); 
-			try {
-					ifs.open(csv_file_path.c_str() );
-					std::string line;
-					while (getline(ifs, line) ) {
-							boost::tokenizer< boost::escaped_list_separator<char> > tokens1(line);
-							dump(tokens1);
-					}
-					ifs.close();
-			} catch (std::exception &ex) {
-					std::cerr << ex.what() << std::endl;
-			}
-			return 0;
-	}
-
-
-
-
-	ptree pt;
-    read_xml("stage.xml", pt);
-
-    if( boost::optional<std::string> str = pt.get_optional<std::string>("root.str") ) {
-        std::cout << str.get() << std::endl;
-    }else {
-        std::cout << "root.str is nothing" << std::endl;
-    }
-    BOOST_FOREACH (const ptree::value_type& child, pt.get_child("root.values") ) {
-        const int value = boost::lexical_cast<int>(child.second.data());
-        std::cout << value << std::endl;
-    }
-	*/
-	
 }
 
 void Game::keydown(int key){
 	switch (key) {
 		case GLUT_KEY_UP:	//前進
-		case '8':
+		//case '8':
 			keystat|=KEYSTAT_GO;
 			break;
 		case GLUT_KEY_DOWN:	//後進
-		case '5':	
+		//case '5':	
 			keystat|=KEYSTAT_BACK;
 			break;
 		case GLUT_KEY_LEFT:	//左旋回
-		case '4':
+		//case '4':
 			keystat|=KEYSTAT_LEFT;
 			break;
 		case GLUT_KEY_RIGHT:	//右旋回
-		case '6':	
+		//case '6':	
 			keystat|=KEYSTAT_RIGHT;
 			break;
 		case 'z':	//ジャンプ
 			keystat|=KEYSTAT_BOOST;
 			break;
-		case KEY_SHOT:	//ショット
-			keystat|=KEYSTAT_SHOT;
+		case KEY_SHOOT:	//ショット
+			keystat|=KEYSTAT_SHOOT;
+			break;
+		case KEY_BOMB:	//ショット
+			keystat|=KEYSTAT_BOMB;
 			break;
 		case KEY_CHANGE_VIEWPOINT:	//視点切り替え
 			keystat |= KEYSTAT_CVIEW;
@@ -289,26 +228,29 @@ void Game::keydown(int key){
 void Game::keyup(int key){
 	switch (key){
 		case GLUT_KEY_UP:	//前進
-		case '8':	
+		//case '8':	
 			keystat &= ~KEYSTAT_GO;
 			break;
 		case GLUT_KEY_DOWN:	//後進
-		case '5':	
+		//case '5':	
 			keystat &= ~KEYSTAT_BACK;
 			break;
 		case GLUT_KEY_LEFT:	//左旋回
-		case '4':
+		//case '4':
 			keystat &= ~KEYSTAT_LEFT;
 			break;
 		case GLUT_KEY_RIGHT:	//右旋回
-		case '6':	
+		//case '6':	
 			keystat &= ~KEYSTAT_RIGHT;
 			break;
 		case 'z':	//ジャンプ
 			keystat &= ~KEYSTAT_BOOST;
 			break;
-		case KEY_SHOT:	//ショット
-			keystat &= ~KEYSTAT_SHOT;
+		case KEY_SHOOT:	//ショット
+			keystat &= ~KEYSTAT_SHOOT;
+			break;
+		case KEY_BOMB:	//ショット
+			keystat &= ~KEYSTAT_BOMB;
 			break;
 		case KEY_CHANGE_VIEWPOINT:	//視点切り替え
 			keystat &= ~KEYSTAT_CVIEW;

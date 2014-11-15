@@ -13,14 +13,16 @@ private:
 	float pitch;
 	float roll;
 	//float yaw;
-	int comand;
-public:
+	int command;
+	int bulletwait;
 	int bombwait;
+public:
 	//model
 	void move();
 	void model();
 	void shoot();
 
+	void shoot(list<Bullet> *a);
 	void dropbomb(list<Bomb> *a);
 	//view
 	void drow();

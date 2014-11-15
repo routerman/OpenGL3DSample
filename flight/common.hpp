@@ -14,8 +14,9 @@
 /************************/
 #define STAGE PLANE
 #define VFAR 5000
-#define KEY_SHOT 'x'
-#define KEY_CHANGE_WEAPON 'x'
+#define KEY_SHOOT 's'
+#define KEY_BOMB  'x'
+#define KEY_CHANGE_WEAPON 'c'
 #define KEY_CHANGE_VIEWPOINT 'a'
 #define KEY_CHANGE_STAGE GLUT_KEY_F4
 #define KEY_RESET GLUT_KEY_F5
@@ -38,11 +39,12 @@
 #define KEYSTAT_LEFT	0x00000008
 #define KEYSTAT_RIGHT	0x00000010
 #define KEYSTAT_BOOST	0x00000020
-#define KEYSTAT_SHOT	0x00000040
+#define KEYSTAT_BOMB 	0x00000040
 #define KEYSTAT_CVIEW	0x00000080
 #define KEYSTAT_CWEAP   0x00000100
 #define KEYSTAT_FLAG1	0x00000200	//視点切り替え
 #define KEYSTAT_FLAG2	0x00000400	//武器切り替え
 #define KEYSTAT_FLAG3	0x00000800	//ジャンプ用のフラグ
+#define KEYSTAT_SHOOT	0x00001000
 
 
