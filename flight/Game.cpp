@@ -11,7 +11,7 @@ void Game::display(){
 	//s->id=0;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);	//3D—LŒø‰»
-    glPushMatrix();
+	glPushMatrix();
 	glTranslated(0,0,0);
 	glRotatef(0.0, 0.0, 0.0, 1.0);
 	list<Fighter>::iterator t = enemylist.begin();
@@ -49,17 +49,17 @@ void Game::display(){
 	//GRID
 	glBegin(GL_LINES);
 	glColor3f(1,1,1);//
-	for(float x=-10000;x<=10000;x+=100){
+	for(double x=-10000; x<=10000; x+=100){
 		glVertex3f(x,-10000,0);
 		glVertex3f(x, 10000,0);
 	}
-	for(float y=-10000;y<=10000;y+=100){
+	for(double y=-10000; y<=10000; y+=100){
 		glVertex3f(-10000,y,0);
 		glVertex3f( 10000,y,0);
 	}
 	glEnd();
 	glBegin(GL_QUADS);
-	glColor3f(0.2,0.2,0.2);//
+	glColor3f(0.2,0.2,0.2);
 	glVertex3f( 10000, 10000,-1);
 	glVertex3f(-10000, 10000,-1);
 	glVertex3f(-10000,-10000,-1);
@@ -70,13 +70,13 @@ void Game::display(){
 	glBegin(GL_LINES);
 	glColor3f(1,0,0);//
 	glVertex3f(0,0,5);
-	glVertex3f(20,0,5);
+	glVertex3f(80,0,5);
 	glColor3f(0,1,0);//
 	glVertex3f(0,0,5);
-	glVertex3f(0,20,5);
+	glVertex3f(0,80,5);
 	glColor3f(0,0,1);//
 	glVertex3f(0,0, 5);
-	glVertex3f(0,0,25);
+	glVertex3f(0,0,85);
 	glEnd();
 
     glPushMatrix();
@@ -134,13 +134,19 @@ void Game::display(){
 
 
 void Game::timer(){
-	fighter.model();
+	//Control
+	fighter.control(keystat);
 	if( keystat & KEYSTAT_BOMB ) fighter.dropbomb(&bomblist);
 	if( keystat & KEYSTAT_SHOOT ) fighter.shoot(&bulletlist);
 	for( list<Fighter>::iterator it = enemylist.begin(); it != enemylist.end(); it++ ){
-		it->model();
+		it->drive(fighter);
 		it->dropbomb(&bomblist);
 		it->shoot(&bulletlist);
+	}
+	//Model
+	fighter.model();
+	for( list<Fighter>::iterator it = enemylist.begin(); it != enemylist.end(); it++ ){
+		it->model();
 	}
 	for( list<Bullet>::iterator it = bulletlist.begin(); it != bulletlist.end(); it++ ){
 		it->move();
@@ -268,8 +274,4 @@ void Game::keyup(int key){
 }
 
 void Game::control(){
-	fighter.control(keystat);
-	for( list<Fighter>::iterator it = enemylist.begin(); it != enemylist.end(); it++ ){
-		it->drive(fighter);
-	}
 }

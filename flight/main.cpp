@@ -3,9 +3,6 @@
 #include "Game.hpp"
 
 class Game;
-class Fighter;
-
-
 Game *game=new Game(1);
 
 ///////////////////////// ハンドラ START /////////////////////////

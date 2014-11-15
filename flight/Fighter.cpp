@@ -33,21 +33,22 @@ void Fighter::move(){
 }
 
 void Fighter::shoot( list<Bullet> *bullets){
-	if ( --bulletwait > 0 && command != 1) return;
-	cout << " shoot!" << endl;
-	Bullet b;
-	b.fire(r,d,v);
-	bullets->push_back(b);
-	bulletwait=1000;
+	if ( --bulletwait < 0 && command == 1) {
+		cout << " shoot!" << endl;
+		Bullet b;
+		b.fire(r,d,v);
+		bullets->push_back(b);
+		bulletwait=10;
+	}
 }
 
 void Fighter::dropbomb( list<Bomb> *bombs){
-	if ( --bombwait > 0 && command != 2) return;
+	if ( --bombwait > 0 || command != 2) return;
 	cout << " Bomb!" << endl;
 	//Bomb b;
 	//b.fire(r,d,v);
 	//bombs->push_back(b);
-	bombwait=100000;
+	bombwait=10;
 }
 
 
@@ -119,11 +120,9 @@ void Fighter::drive(Fighter target){
 	if ( dist > 1000 ) {
 		f = 10;
 		c = 0;
-		command = 1;
 	} else if( dist <= 1000 && dist > 300 ){
 		f = 3;
 		c = 0;
-		command = 2;
 	} else {
 		f = 0.5;
 		c = 0.1;
@@ -141,22 +140,16 @@ void Fighter::drive(Fighter target){
 	//if(cc<0)cc*=-1;
 	cc*=cc;
 	pitch*=cc;
-	//roll-=uxd.z;
-	//if( uxd.z>0.1 || uxd.z<-0.1 )roll*=uxd.z;
-	/*
-	//if(roll>-0.01 && roll<0.01){
-		//roll*=0.1;
-		pitch=0.1 * F3::dot( F3::cross(w,this->d),uxd);
-		if(roll*roll+pitch*pitch<0.01 && F3::dot(w,this->d) > 0){
-			//min{-u.z}(roll)
-			//if(pitch>-0.01 && pitch < 0.01)roll+=0.01*u.y;
-			//if(dist<100);
-		}
-	//}
-	*/
+	//if( roll * roll + pitch * pitch < 0.01 && F3::dot(w,this->d) > 0){
+	if( roll * roll + pitch * pitch < 0.0001 && dist < 100 ){
+		command = 1;
+	}
+
 	//regulater
 	if( roll > 0.05 ) roll = 0.05;
 	else if( roll < -0.05 ) roll = -0.05;
+	else roll = roll - 5 * roll * roll;
 	if( pitch > 0.01 ) pitch = 0.01;
 	else if( pitch < -0.01 ) pitch = -0.01;
+	else pitch = pitch - 5 * pitch * pitch;
 }
