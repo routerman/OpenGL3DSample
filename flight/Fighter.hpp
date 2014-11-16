@@ -5,9 +5,10 @@
 #include "Bullet.hpp"
 #include "Bomb.hpp"
 
-class Fighter:public Machine{
+class Fighter : public Machine{
 private:
-	//int bullet;
+	string name;
+	unsigned int hp;
 	float f;
 	float c;
 	float pitch;
@@ -16,20 +17,25 @@ private:
 	int command;
 	int bulletwait;
 	int bombwait;
+	int targetwait;
 public:
 	//model
+	void init();
 	void move();
 	void model();
 	void shoot();
 
-	void shoot(list<Bullet> *a);
-	void dropbomb(list<Bomb> *a);
+	void shoot(list<Bullet> *bullets);
+	void dropbomb(list<Bomb> *bombs);
 	//view
 	void drow();
 
 	//control
 	void control(int keystat);
-	void drive(Fighter target);
+	Fighter* getTarget( list<Fighter> *enemys );
+	void drive(list<Fighter> *enemys);
+	//int bullet;
+	void decreaseHP(unsigned int damage);
 
 	Fighter();
 };

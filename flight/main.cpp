@@ -74,7 +74,7 @@ int main(int argc, char** argv){
 	game->init();	
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-	glutInitWindowPosition(0, 0); 
+	glutInitWindowPosition(200, 0); 
 	glutCreateWindow("OpenAir");
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glMatrixMode(GL_PROJECTION);

@@ -4,7 +4,7 @@
 void Bullet::fire(F3 r,F3 d,F3 v){
 	this->r=r+3*d;
 	this->d=d;
-	this->v=v+3*d;
+	this->v=v+5*d;
 	this->active=true;
 }
 

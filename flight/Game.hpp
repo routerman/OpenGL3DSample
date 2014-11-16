@@ -27,6 +27,7 @@ public:
 	Fighter getFighter(){return fighter;};
 	Game(int gametype);
 	int time;
+	void stage();
 	void display();
 	void timer();
 	void init();

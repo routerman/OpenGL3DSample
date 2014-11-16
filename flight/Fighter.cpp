@@ -1,21 +1,38 @@
 #include "Fighter.hpp"
 
 Fighter::Fighter(){
-	r.set(0,20,3);
-	v.set(0.1,0,0);
-	a.set(0,0,0);
-	u.set(0,0,1);
-	d.set(1,0,0);
+	name = "aaa";
 	m=1000;
 	size=3;
 	roll=0;
 	pitch=0;
 	f=0;
+	init();
 }
 
+void Fighter::init(){
+	r.set(0,-1000,0);
+	v.set(0,10,0);
+	a.set(0,0,0);
+	u.set(0,0,1);
+	d.set(0,1,0);
+	bulletwait=0;
+	bombwait=0;
+	hp=100;
+}
 //MODEL
 
+void decreaseHP(unsigned int damage){
+
+}
+
 void Fighter::model(){
+	if ( hp < 0) init();
+	if ( r.x > HORIZON || r.x < -HORIZON 
+	  || r.y > HORIZON || r.y < -HORIZON 
+	  || r.z > HORIZON || r.z < -HORIZON ) {
+		init();
+	}
 	move();
 }
 
@@ -33,22 +50,28 @@ void Fighter::move(){
 }
 
 void Fighter::shoot( list<Bullet> *bullets){
-	if ( --bulletwait < 0 && command == 1) {
-		cout << " shoot!" << endl;
-		Bullet b;
+	bulletwait--;
+	//cout << bulletwait << endl;
+	if ( bulletwait < 0 && command == 1) {
+	 	//cout << " shoot!" << endl;
+ 		Bullet b;
 		b.fire(r,d,v);
 		bullets->push_back(b);
-		bulletwait=10;
+		bulletwait=50;
+		command = 0;
 	}
 }
 
 void Fighter::dropbomb( list<Bomb> *bombs){
-	if ( --bombwait > 0 || command != 2) return;
-	cout << " Bomb!" << endl;
-	//Bomb b;
-	//b.fire(r,d,v);
-	//bombs->push_back(b);
-	bombwait=10;
+	bombwait--;
+	if ( bombwait < 0 && command == 2) {
+		//cout << " Bomb!" << endl;
+		Bomb b;
+		b.fire(r,d,v);
+		bombs->push_back(b);
+		bombwait=50;
+		command = 0;
+	}
 }
 
 
@@ -113,12 +136,32 @@ void Fighter::control(int keystat){
 	
 }
 
-void Fighter::drive(Fighter target){
+Fighter* Fighter::getTarget( list<Fighter> *enemys ){
+	double dist, min_dist = HORIZON;
+	F3 tmp;
+	Fighter *target;
+	list<Fighter>::iterator it = enemys->begin();
+	target = &(*it);
+	for( list<Fighter>::iterator it = enemys->begin(); it != enemys->end(); it++ ){
+		tmp = it->r - this->r;
+		dist = F3::range(tmp);
+		if ( dist > 0.1 && dist < min_dist ){
+			min_dist = dist;
+			target = &(*it);
+		}
+	}
+	return target;
+}
+
+void Fighter::drive( list<Fighter> *enemys ){
 	F3 w, uxd, b;
-	w = target.r - this->r;
-	float dist = F3::range(w);
+	Fighter *target = getTarget(enemys);
+
+	w = target->r - this->r;
+	double dist = F3::range(w);
+	//cout << target->name << dist << endl;
 	if ( dist > 1000 ) {
-		f = 10;
+		f = 20;
 		c = 0;
 	} else if( dist <= 1000 && dist > 300 ){
 		f = 3;
@@ -141,8 +184,12 @@ void Fighter::drive(Fighter target){
 	cc*=cc;
 	pitch*=cc;
 	//if( roll * roll + pitch * pitch < 0.01 && F3::dot(w,this->d) > 0){
-	if( roll * roll + pitch * pitch < 0.0001 && dist < 100 ){
-		command = 1;
+	if( roll * roll + pitch * pitch < 0.05 ){
+		if ( dist > 0 && dist < 1000 ) {
+			command = 1; //shoot
+		//} else if ( dist < 300 ) {
+			command = 2; //bomb
+		}
 	}
 
 	//regulater
@@ -152,4 +199,5 @@ void Fighter::drive(Fighter target){
 	if( pitch > 0.01 ) pitch = 0.01;
 	else if( pitch < -0.01 ) pitch = -0.01;
 	else pitch = pitch - 5 * pitch * pitch;
+	if ( roll > 0.01 || roll < -0.01 ) pitch = 0;
 }

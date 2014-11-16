@@ -1,5 +1,6 @@
 #pragma once
 #include "Include.hpp"
+#include "common.hpp"
 #include "Weapon.hpp"
 #include "F3.hpp"
 

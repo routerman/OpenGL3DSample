@@ -1,7 +1,9 @@
 ﻿//#pragma once
 #ifdef __APPLE__
-	#define WINDOW_WIDTH 1200
-	#define WINDOW_HEIGHT 720
+	//#define WINDOW_WIDTH 1660
+	//#define WINDOW_HEIGHT 1000
+	#define WINDOW_WIDTH 1460
+	#define WINDOW_HEIGHT 1000
 #else 
 	#define WINDOW_WIDTH 2500
 	#define WINDOW_HEIGHT 1500
@@ -9,11 +11,11 @@
 	//#define INF 3.36e38
 	#define INF 100000
 #endif
-
+#define HORIZON 10000
 
 /************************/
 #define STAGE PLANE
-#define VFAR 5000
+#define VFAR 50000
 #define KEY_SHOOT 's'
 #define KEY_BOMB  'x'
 #define KEY_CHANGE_WEAPON 'c'
