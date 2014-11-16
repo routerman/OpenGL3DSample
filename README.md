@@ -1,28 +1,25 @@
-OpenGL3DSample
-==============
+# OpenGL3D Sample
+===
 
-#3D Applications with OpenGL
+# 3D Applications with OpenGL
 
-##Execution
-###CentOS
+## Execution
+### CentOS
 
-::
 	$sudo yum install freeglut freeglut-devel
 
-###Ubuntu
+### Ubuntu
 
-::
 	$sudo apt-get install freeglut3-dev libglew1.5-dev
 
-###Mac
-nothing..
+### MacOS X or Windows 8.1
 
+http://keiorogiken.wordpress.com/2013/02/10/startopengl/
 
-==============
+***
 ##Sample Programs
 
-1. molecular
-	- 
-
-
-
+* molecular
+* flight
+* soccer
+* bom(developping..)
