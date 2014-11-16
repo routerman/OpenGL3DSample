@@ -1,14 +1,15 @@
-//#pragma once
+#pragma once
 #include "Include.hpp"
 #include "common.hpp"
 #include "Machine.hpp"
 #include "Bullet.hpp"
 #include "Bomb.hpp"
+class Bomb;
 
 class Fighter : public Machine{
 private:
 	string name;
-	unsigned int hp;
+	int hp;
 	float f;
 	float c;
 	float pitch;

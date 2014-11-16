@@ -18,19 +18,20 @@ void Fighter::init(){
 	d.set(0,1,0);
 	bulletwait=0;
 	bombwait=0;
-	hp=100;
+	hp=1000;
 }
 //MODEL
 
-void decreaseHP(unsigned int damage){
-
+void Fighter::decreaseHP(unsigned int damage){
+	hp -= damage;
+	a.set(0,0,10); //vibration
 }
 
 void Fighter::model(){
-	if ( hp < 0) init();
-	if ( r.x > HORIZON || r.x < -HORIZON 
-	  || r.y > HORIZON || r.y < -HORIZON 
-	  || r.z > HORIZON || r.z < -HORIZON ) {
+	if ( hp < 0
+		|| r.x < -HORIZON || r.x > HORIZON 
+		|| r.y < -HORIZON || r.y > HORIZON 
+		|| r.z < -HORIZON || r.z > HORIZON ) {
 		init();
 	}
 	move();
@@ -69,7 +70,7 @@ void Fighter::dropbomb( list<Bomb> *bombs){
 		Bomb b;
 		b.fire(r,d,v);
 		bombs->push_back(b);
-		bombwait=50;
+		bombwait=200;
 		command = 0;
 	}
 }
@@ -161,13 +162,13 @@ void Fighter::drive( list<Fighter> *enemys ){
 	double dist = F3::range(w);
 	//cout << target->name << dist << endl;
 	if ( dist > 1000 ) {
-		f = 20;
+		f = 10;
 		c = 0;
 	} else if( dist <= 1000 && dist > 300 ){
-		f = 3;
+		f = 2;
 		c = 0;
 	} else {
-		f = 0.5;
+		f = 0;
 		c = 0.1;
 	}
 	w = F3::unit(w);
@@ -189,6 +190,7 @@ void Fighter::drive( list<Fighter> *enemys ){
 			command = 1; //shoot
 		//} else if ( dist < 300 ) {
 			command = 2; //bomb
+			f = 0;
 		}
 	}
 
@@ -196,8 +198,8 @@ void Fighter::drive( list<Fighter> *enemys ){
 	if( roll > 0.05 ) roll = 0.05;
 	else if( roll < -0.05 ) roll = -0.05;
 	else roll = roll - 5 * roll * roll;
-	if( pitch > 0.01 ) pitch = 0.01;
-	else if( pitch < -0.01 ) pitch = -0.01;
+	if( pitch > 0.05 ) pitch = 0.05;
+	else if( pitch < -0.05 ) pitch = -0.05;
 	else pitch = pitch - 5 * pitch * pitch;
-	if ( roll > 0.01 || roll < -0.01 ) pitch = 0;
+	if ( roll > 0.05 || roll < -0.05 ) pitch = 0;
 }

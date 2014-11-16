@@ -186,24 +186,28 @@ void Game::display(){
 void Game::timer(){
 	//Control
 	fighter.control(keystat);
-	if( keystat & KEYSTAT_BOMB ) fighter.dropbomb(&bomblist);
-	if( keystat & KEYSTAT_SHOOT ) fighter.shoot(&bulletlist);
 	for( list<Fighter>::iterator it = enemylist.begin(); it != enemylist.end(); it++ ){
-		//it->drive(fighter);
 		it->drive(&enemylist);
-		it->dropbomb(&bomblist);
-		it->shoot(&bulletlist);
 	}
 	//Model
 	fighter.model();
+	if( keystat & KEYSTAT_BOMB ) fighter.dropbomb(&bomblist);
+	if( keystat & KEYSTAT_SHOOT ) fighter.shoot(&bulletlist);
 	for( list<Fighter>::iterator it = enemylist.begin(); it != enemylist.end(); it++ ){
+		it->dropbomb(&bomblist);
+		it->shoot(&bulletlist);
 		it->model();
 	}
 	for( list<Bullet>::iterator it = bulletlist.begin(); it != bulletlist.end(); it++ ){
 		it->move();
 	}
-	for( list<Bomb>::iterator it = bomblist.begin(); it != bomblist.end(); it++ ){
-		it->model();
+	for( list<Bomb>::iterator it = bomblist.begin(); it != bomblist.end(); ){
+		it->model(&enemylist);
+		if ( it->getState() == NOUSE ) {
+			it = bomblist.erase(it);
+			continue;
+		}
+		it++;
 	}
 }
 

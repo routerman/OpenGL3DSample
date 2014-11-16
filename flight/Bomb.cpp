@@ -5,13 +5,13 @@
 Bomb::Bomb(){
 	state=NOUSE;
 	time=0;
+	radius = 4;
 	r.set(0,0,0);
 	v.set(0,0,0);
 	a.set(0,0,0);
 }
 
 Bomb::~Bomb(){
-
 }
 
 
@@ -24,34 +24,40 @@ void Bomb::fire(F3 r,F3 d,F3 v){
 	this->active=true;
 }
 
+WeaonState Bomb::getState(){
+	return state;
+}
 
-void Bomb::model(){
+void Bomb::model( list<Fighter> *enemys ) {
 	move();
 	time++;
-	//if(F3::range(r)>10000){
-	//	state=NOUSE;
-	//	//~Bomb();
-	//}
-	if( state==MOVE ){
+	if ( ( state == NOUSE ) || ( state == FIRE && time > 400 ) ) {
+		state = NOUSE;
+		return;
+	} else if ( state == MOVE ) {
 		if ( time == 500 || r.x > HORIZON || r.x < -HORIZON 
 							  || r.y > HORIZON || r.y < -HORIZON 
 							  || r.z > HORIZON || r.z < -HORIZON ) {
-			state=FIRE;
-			time=0;
+			state = FIRE;
+			time = 0;
 			v.set(0,0,0);
+			return;
+		}
+		for( list<Fighter>::iterator it = enemys->begin(); it != enemys->end(); it++ ){
+			if ( F3::range( it->r - this->r ) < radius ) {
+				state=FIRE;
+				time=0;
+				v.set(0,0,0);
+				return;
+			}
+		}
+	} else if (state == FIRE ) {
+		for( list<Fighter>::iterator it = enemys->begin(); it != enemys->end(); it++ ){
+			if ( F3::range( it->r - this->r ) < radius ) {
+					it->decreaseHP(1);
+			}
 		}
 	}
-	
-	/*
-	if( time>500 && state==MOVE){
-		state=FIRE;
-		time=0;
-		v.set(0,0,0);
-	}else if(time>1000 && state==FIRE){
-		state=NOUSE;
-		//~Bomb();
-	}
-	*/
 }
 
 void Bomb::move(){
@@ -64,16 +70,17 @@ void Bomb::drow(){
 		glPushMatrix();
 		glTranslated(r.x,r.y,r.z);
 		glColor3f(0.7,0.7,0.7);
-		glutSolidSphere(4,12,12);
+		glutSolidSphere(radius,12,12);
 		glPopMatrix();
 		glEnd();
 		break;
 	case FIRE:
 		glPushMatrix();
 		glTranslated(r.x,r.y,r.z);
-		glColor3f(1,1-(float)time/100,0);
-		if(time>0 && time<=100 )glutSolidSphere(200*(1-exp(-(float)time/10)),12,12);
-		else if(time>100 && time<200)glutSolidSphere(200*(1-exp((float)(time-200)/10)),12,12);
+		glColor3f(1,1-(float)time/400,0);
+		if(time>0 && time<=200 ) radius = 400 * ( 1 - exp( -(float)time/20) );
+		else if(time>200 && time<400) radius = 400 * (1 - exp( (float)(time-400)/20) );
+		glutSolidSphere( radius, 12, 12);
 		glPopMatrix();
 		break; 
 	}
