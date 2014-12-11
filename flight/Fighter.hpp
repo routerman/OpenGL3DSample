@@ -11,6 +11,7 @@ private:
 	string name;
 	int hp;
 	float f;
+	float max_f;
 	float c;
 	float pitch;
 	float roll;

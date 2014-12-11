@@ -7,11 +7,12 @@ Fighter::Fighter(){
 	roll=0;
 	pitch=0;
 	f=0;
+	max_f=20;
 	init();
 }
 
 void Fighter::init(){
-	r.set(0,-1000,0);
+	r.set(0,-1000,1000);
 	v.set(0,10,0);
 	a.set(0,0,0);
 	u.set(0,0,1);
@@ -24,7 +25,7 @@ void Fighter::init(){
 
 void Fighter::decreaseHP(unsigned int damage){
 	hp -= damage;
-	a.set(0,0,10); //vibration
+	v.set(0,0,10); //vibration
 }
 
 void Fighter::model(){
@@ -43,9 +44,10 @@ void Fighter::move(){
 	//pitch
 	u=F3::rot(u, F3::unit(F3::cross(d,u)),pitch);
 	d=F3::rot(d, F3::unit(F3::cross(d,u)),pitch);
-	v=F3::range(v)*d;
+	v= 0.3*F3::range(v)*d + 0.7*v;
 	a=f/m*d-0.1*pitch*v;
-	
+	a.z-=GRAVITY/100; //10ms = 1/100s
+	cout << a.z <<endl;
 	v+=a;
 	r+=v;
 }
@@ -121,7 +123,7 @@ void Fighter::control(int keystat){
 	else roll=0;
 
 	//boost
-	if( keystat & KEYSTAT_BOOST )f=10;
+	if( keystat & KEYSTAT_BOOST )f=max_f;
 	//else if( keystat & STAT_CWEAP )f=0.1;
 	else f=0;
 
@@ -162,10 +164,10 @@ void Fighter::drive( list<Fighter> *enemys ){
 	double dist = F3::range(w);
 	//cout << target->name << dist << endl;
 	if ( dist > 1000 ) {
-		f = 10;
+		f = max_f;
 		c = 0;
 	} else if( dist <= 1000 && dist > 300 ){
-		f = 2;
+		f = max_f/5;
 		c = 0;
 	} else {
 		f = 0;

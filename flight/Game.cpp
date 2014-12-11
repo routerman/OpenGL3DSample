@@ -213,11 +213,11 @@ void Game::timer(){
 
 void Game::init(){
 	fighter.r.set(0,1000,1000);
-	fighter.d.set(1,0,0);
+	fighter.d.set(0,1,0);
 	for (int i=-10; i<10; i++) {
 		Fighter a;
 		a.r.set(99*i*i,99*i,99*i);
-		a.d.set(0,1,0);
+		//a.d.set(0,1,0);
 		enemylist.push_back(a);
 	}
 	//Surface initialization
